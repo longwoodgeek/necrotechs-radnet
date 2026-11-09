@@ -25,6 +25,7 @@ RadNet is an evolving NecroTechs project investigating how small, inexpensive de
 | Reproducible observations and caveats | [Field tests](docs/field-tests/2026-11-08-radio-tests.md) |
 | Current incident and recovery | [Operation Phoenix](docs/recovery/operation-phoenix-2026-11-09.md) |
 | Roadmap and proposed tools | [Roadmap](docs/roadmap.md) |
+| Experimental HaLow + LoRa heartbeat / SAR connectivity | [Dual-radio field-node concept](docs/concepts/halow-lora-sar-node.md) |
 | Radio/regulatory caution | [Radio safety notes](docs/radio-and-regulatory-notes.md) |
 | Values, attribution and AI transparency | [Engineering charter](docs/engineering-charter.md) |
 | Contributing and reporting vulnerabilities | [CONTRIBUTING](CONTRIBUTING.md) · [SECURITY](SECURITY.md) |
@@ -43,6 +44,7 @@ RadNet is an evolving NecroTechs project investigating how small, inexpensive de
 - **LinkProbe:** Python prototype drafted and offline codec/summary unit tests reported; *not yet validated on physical radio interfaces*. Public release will follow a code/security review and hardware verification.
 - **FECC/SentinelLink:** design-stage concepts; no certified or deployed regional emergency service.
 - **GNSS/offline time:** proposed, not yet installed or proven on the SharkDeck host.
+- **HaLow + LoRa SAR connectivity:** early research concept only; neither deployed nor tested for rescue use.
 
 ## Independent projects and acknowledgments
 
