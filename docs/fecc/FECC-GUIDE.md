@@ -163,7 +163,7 @@ A public research entry must be reviewed for redaction before release; private r
 - Do not merge or conflate independently developed Reticulum, RNode, NomadNet, HaLow or external translation projects; respect their licenses and attributions.
 
 ## Related public references
-- [RadNet prototype architecture](../architecture.md)
-- [RadNet field-test notes](../field-tests/2026-11-08-radio-tests.md)
-- [Engineering charter](../engineering-charter.md)
-- [Radio/regulatory notes](../radio-and-regulatory-notes.md)
+- [RadNet prototype architecture](https://github.com/longwoodgeek/necrotechs-radnet/blob/main/docs/architecture.md)
+- [RadNet field-test notes](https://github.com/longwoodgeek/necrotechs-radnet/blob/main/docs/field-tests/2026-11-08-radio-tests.md)
+- [Engineering charter](https://github.com/longwoodgeek/necrotechs-radnet/blob/main/docs/engineering-charter.md)
+- [Radio/regulatory notes](https://github.com/longwoodgeek/necrotechs-radnet/blob/main/docs/radio-and-regulatory-notes.md)
