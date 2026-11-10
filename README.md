@@ -22,6 +22,9 @@ RadNet is an evolving NecroTechs project investigating how small, inexpensive de
 | Topic | Document |
 |---|---|
 | How the prototype fits together | [Architecture](docs/architecture.md) |
+| FECC Core, CyberDeck and Link common framework | [FECC Unified Field Guide v0.1](docs/fecc/FECC-GUIDE.md) |
+| Public FECC/SentinelLink research | [Research log and experiment protocol](docs/research/README.md) |
+| First FECC architecture research entry | [FEC-R-2026-001](docs/research/2026-11-10-fecc-baseline.md) |
 | Reproducible observations and caveats | [Field tests](docs/field-tests/2026-11-08-radio-tests.md) |
 | Current incident and recovery | [Operation Phoenix](docs/recovery/operation-phoenix-2026-11-09.md) |
 | Roadmap and proposed tools | [Roadmap](docs/roadmap.md) |
