@@ -36,3 +36,7 @@ The Mac Heltec retained its small stock antenna. Antenna orientation, link budge
 5. Publish the raw data with personal locations, identifying station details, and private keys removed.
 
 **Engineering rule:** Trust the mathematics. Verify the reality.
+
+## Subsequent measurement update — November 11
+
+The limitations above describe the November 8 exploratory tests. Three later indoor LinkProbe runs now have CSV and terminal-summary evidence: [November 11 results and LP-007 pre-flight](2026-11-11-linkprobe.md). They establish 20/20 unique acknowledged probes, with round-trip application latency, paced goodput and receiver-reported packet metrics. They do not supply measured outdoor LP-007 results, verified maximum throughput, independent route proof or regulatory clearance.
