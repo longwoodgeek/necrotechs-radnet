@@ -15,7 +15,7 @@ RadNet is an evolving NecroTechs project investigating how small, inexpensive de
 - Operator-reported message delivery at an estimated **~200 ft / ~61 m** with an apartment building and HVAC obstacles between stations; not a surveyed distance or statistically measured reliability result.
 - An operational, Wi-Fi-isolated radio/BBS host during the initial field tests (its wall clock was **not synchronized**, and is not valid for RTT claims).
 
-**New measurement update (November 11):** [LinkProbe indoor results and LP-007 pre-flight](docs/field-tests/2026-11-11-linkprobe.md) records 20/20 unique application probes acknowledged in three indoor runs, receiver-reported RSSI/SNR, round-trip latency and paced goodput. Small sample; route isolation and deployed-code provenance remain unverified.
+**New measurement update (November 11):** [LinkProbe indoor and outdoor LP-007 results](docs/field-tests/2026-11-11-linkprobe.md) records 30/30 unique application probes acknowledged: 20 indoors plus 10 at an operator-estimated ~200 ft with building and HVAC obstructions. Receiver-reported RSSI/SNR, round-trip latency and paced goodput are documented. Small sample; route isolation and deployed-code provenance remain unverified.
 
 **What has NOT been demonstrated:** maximum on-air throughput; guaranteed range; independent FCC compliance certification; emergency-service reliability; fully validated infrastructure failover.
 
@@ -46,7 +46,7 @@ RadNet is an evolving NecroTechs project investigating how small, inexpensive de
 ## Project status
 
 - **RadNet field node and BBS:** prototype demonstrated; a later SD-card filesystem incident required preservation and repair (see recovery log).
-- **LinkProbe:** experimental, operator-reported patched v0.1.1-dev used for three documented indoor runs (20/20 unique ACKs). Counts/medians checked against CSV and screenshots; repository/deployed source equivalence and LoRa-only route proof remain pending. LP-007 outdoor measurements and release qualification are pending.
+- **LinkProbe:** experimental, operator-reported patched v0.1.1-dev used for three documented indoor runs (20/20 unique ACKs). Counts/medians checked against CSV and screenshots; repository/deployed source equivalence and LoRa-only route proof remain pending. LP-007 now has ten acknowledged probes at the operator-reported obstructed outdoor position; release qualification remains pending.
 - **FECC/SentinelLink:** design-stage concepts; no certified or deployed regional emergency service.
 - **GNSS/offline time:** proposed, not yet installed or proven on the SharkDeck host.
 - **HaLow + LoRa SAR connectivity:** early research concept only; neither deployed nor tested for rescue use.
