@@ -54,9 +54,9 @@ The new run reused the prior command: raw notes still say `LP-006 Robs room repe
 
 The cumulative export contains the previous 20 records unchanged plus 10 new records. Total available unique evidence is now **30/30 ACK**, not 35/35. A separate five-probe outdoor starter series is not present; the documented outdoor run contains ten probes. Do not infer that all pre-flight checklist items were completed from successful ACKs.
 
-## Reception outlier and interpretation
+## Screenshot reading discrepancy and interpretation
 
-Probe 8 reports Mac RX RSSI **−44 dBm**; the other nine Mac readings span **−94 to −89 dBm**. Preserve and flag the reading without deleting it, substituting a value or diagnosing the cause. All-probe median remains −92.5 dBm. SharkDeck readings span −115 to −110 dBm. The directional median difference is 20.5 dB; power, antennas, propagation, route or metadata behavior may contribute, without a diagnosis.
+The screenshot's probe 8 Mac RSSI was initially read as −44 dBm during transcription, but the actual CSV records **−94 dBm**. Use the preserved CSV for per-probe analysis: all ten Mac readings span **−94 to −89 dBm**, with median −92.5 dBm. No CSV outlier is established. Preserve both source artifacts; do not alter the CSV to match a screenshot reading. SharkDeck readings span −115 to −110 dBm. The directional median difference is 20.5 dB; power, antennas, propagation, route or metadata behavior may contribute, without a diagnosis.
 
 Relative to LP-006 indoors, median Mac/Deck RSSI is 17.5/15 dB weaker and median SNR is lower. All ten application probes still received matching ACKs in this particular run. This does not establish RF sensitivity margin, a range limit, zero true loss or emergency-service reliability. The small median RTT difference is not an established performance improvement.
 
@@ -64,4 +64,4 @@ Reported TX metadata remains +7 dBm (~5 mW) Mac and +13 dBm (~20 mW) SharkDeck, 
 
 ## Follow-up
 
-Before interpreting this as a repeatable range benchmark, record antenna orientations/heights, stationary peer position, HVAC state where safely observable, weather, distance-estimation method, radio/firmware/settings, deployed script hashes and actual route evidence excluding IP alternatives. Check packet-metadata provenance for the RSSI outlier. Keep the existing radio settings unchanged and preserve the managed responder and private identity. Any further test remains operator-controlled and subject to site safety and independently verified lawful operation.
+Before interpreting this as a repeatable range benchmark, record antenna orientations/heights, stationary peer position, HVAC state where safely observable, weather, distance-estimation method, radio/firmware/settings, deployed script hashes and actual route evidence excluding IP alternatives. Resolve any remaining screenshot legibility question against the original capture and CSV. Keep the existing radio settings unchanged and preserve the managed responder and private identity. Any further test remains operator-controlled and subject to site safety and independently verified lawful operation.
