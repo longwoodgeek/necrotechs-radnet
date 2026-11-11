@@ -15,7 +15,9 @@ RadNet is an evolving NecroTechs project investigating how small, inexpensive de
 - Operator-reported message delivery at an estimated **~200 ft / ~61 m** with an apartment building and HVAC obstacles between stations; not a surveyed distance or statistically measured reliability result.
 - An operational, Wi-Fi-isolated radio/BBS host during the initial field tests (its wall clock was **not synchronized**, and is not valid for RTT claims).
 
-**What has NOT been demonstrated:** measured application throughput or packet-delivery rates; measured peer RSSI/SNR; guaranteed range; independent FCC compliance certification; emergency-service reliability; fully validated infrastructure failover.
+**New measurement update (November 11):** [LinkProbe indoor results and LP-007 pre-flight](docs/field-tests/2026-11-11-linkprobe.md) records 20/20 unique application probes acknowledged in three indoor runs, receiver-reported RSSI/SNR, round-trip latency and paced goodput. Small sample; route isolation and deployed-code provenance remain unverified.
+
+**What has NOT been demonstrated:** maximum on-air throughput; guaranteed range; independent FCC compliance certification; emergency-service reliability; fully validated infrastructure failover.
 
 ## Start here
 
@@ -44,7 +46,7 @@ RadNet is an evolving NecroTechs project investigating how small, inexpensive de
 ## Project status
 
 - **RadNet field node and BBS:** prototype demonstrated; a later SD-card filesystem incident required preservation and repair (see recovery log).
-- **LinkProbe:** Python prototype drafted and offline codec/summary unit tests reported; *not yet validated on physical radio interfaces*. Public release will follow a code/security review and hardware verification.
+- **LinkProbe:** experimental, operator-reported patched v0.1.1-dev used for three documented indoor runs (20/20 unique ACKs). Counts/medians checked against CSV and screenshots; repository/deployed source equivalence and LoRa-only route proof remain pending. LP-007 outdoor measurements and release qualification are pending.
 - **FECC/SentinelLink:** design-stage concepts; no certified or deployed regional emergency service.
 - **GNSS/offline time:** proposed, not yet installed or proven on the SharkDeck host.
 - **HaLow + LoRa SAR connectivity:** early research concept only; neither deployed nor tested for rescue use.
