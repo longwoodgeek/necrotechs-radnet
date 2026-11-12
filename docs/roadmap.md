@@ -6,7 +6,7 @@ These represent experiments and design proposals, **not operational promises**.
 |---|---|---|
 | 915 MHz RNode/LoRa prototype | Successful exploratory connectivity | Controlled packet-delivery and link-budget tests |
 | NomadNet Pocket BBS | Page browsing observed through obstacles | Post-recovery stability and repeated uncached page fetches |
-| LinkProbe v0.1 | Code drafted on private dev branch; not live-radio-tested | Runtime audit and hardware validation before public release |
+| LinkProbe experimental v0.1.1-dev (operator-reported) | LP-004–LP-007: 30/30 unique application probes acknowledged across indoor and obstructed outdoor runs; see [November 11 field report](field-tests/2026-11-11-linkprobe.md). Not release-qualified. | Verify deployed source hashes, LoRa-only routing, exact spreading factor/bandwidth, firmware and hardware settings; repeat independently before a public release |
 | Reticulum `rncp` file copy | Feature identified | Authenticated transfer + SHA256 comparison |
 | GPS / offline UTC | Existing GPS module identified provisionally | Physical pin verification, valid GNSS fix, chrony tracking |
 | Permanent Proxmox transport | Planned | VM USB pass-through, station power/UPS, backups and compliance |
