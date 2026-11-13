@@ -1,6 +1,7 @@
 """Truthful local-only startup diagnostics; no network or keys are probed."""
 from pathlib import Path
 import sqlite3
+from contextlib import closing
 
 BANNER = """=========================================
        N E C R O T E C H S
@@ -11,7 +12,7 @@ def render_boot(db_path: str) -> str:
     path = Path(db_path)
     if path.exists():
         try:
-            with sqlite3.connect(f"file:{path.resolve()}?mode=ro", uri=True) as db:
+            with closing(sqlite3.connect(path.resolve().as_uri() + "?mode=ro", uri=True)) as db:
                 ok = db.execute("PRAGMA quick_check").fetchone()[0] == "ok"
                 journal = "[ OK ] Existing SQLite journal readable" if ok else "[FAIL] SQLite integrity check failed"
         except (sqlite3.Error, OSError):

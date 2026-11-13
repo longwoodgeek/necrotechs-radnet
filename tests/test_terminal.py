@@ -38,7 +38,7 @@ class TerminalTests(unittest.TestCase):
             choices = iter(["2", "0"])
             run(db, input_fn=lambda prompt: next(choices), output_fn=output.append)
             text = "\n".join(output)
-            self.assertIn("v0.3", text)
+            self.assertIn("v0.4", text)
             self.assertIn("LOCAL POSTING ENABLED", text)
             self.assertIn("AUTHORS UNVERIFIED", text)
             self.assertIn("Identity: NOT VERIFIED", text)

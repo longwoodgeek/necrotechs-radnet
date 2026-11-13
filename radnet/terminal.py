@@ -1,6 +1,7 @@
 """Local RadNet BBS prototype with development posting. No sockets, accounts or shell execution."""
 from pathlib import Path
 import sqlite3
+from contextlib import closing
 import sys
 import unicodedata
 
@@ -36,7 +37,7 @@ def read_events(db_path, limit=20):
     if not path.is_file():
         return [], "No local journal found. Nothing has been created."
     try:
-        with sqlite3.connect(f"file:{path.resolve()}?mode=ro", uri=True) as db:
+        with closing(sqlite3.connect(path.resolve().as_uri() + "?mode=ro", uri=True)) as db:
             rows = db.execute(
                 "SELECT id, envelope FROM events ORDER BY received_seq DESC LIMIT ?",
                 (limit,),
@@ -82,7 +83,7 @@ def page(choice, db_path):
     if choice == "2":
         return station_status(db_path)
     if choice == "3":
-        return "CAPTAIN'S LOG\nComing soon. Local journal events are visible under Message Boards."
+        return "CAPTAIN'S LOG\nLocal append-only archive; select 3 in the interactive terminal."
     if choice == "4":
         return "COMMUNITY RESOURCES\nComing soon. No external resources have been verified."
     if choice == "5":
@@ -160,10 +161,109 @@ def interactive_boards(db_path, input_fn, output_fn, ansi=False):
         except BoardError as exc:
             output_fn(f"Board operation rejected: {exc}")
 
+def display_log(record, output_fn):
+    """Sanitize all archive text at the display boundary, including metadata."""
+    data = record['data']
+    receipt = data['receipt']
+    lines = [
+        'Original' if record['envelope']['kind'] == 'log.create' else 'Correction',
+        f"Entry ID: {record['entry_id']}", f"Event ID: {record['id']}",
+        f"Local receipt sequence: {record['received_seq']} (local ordering only)",
+        f"Title: {data['title']}", f"Operator: {record['envelope']['author']} [UNVERIFIED]",
+        data['body'], f"Claimed operator time: {data['claimed_time'] or 'not supplied'}",
+        f"Claimed source: {data['time_source']}", f"Uncertainty: {data['uncertainty']}",
+        f"Receipt clock: {receipt['time']} / {receipt['source']}",
+        f"Receipt uncertainty: {receipt['uncertainty']}", f"Provenance: {data['provenance']}",
+        f"Correction reason: {data.get('reason') or 'none'}",
+    ]
+    for line in lines:
+        output_fn(safe_text(line, 4100))
+
+
+def interactive_log(db_path, input_fn, output_fn):
+    from .captains_log import CaptainsLog, LogError
+    service = CaptainsLog(db_path)
+
+    def ask(prompt, limit):
+        value = input_fn(prompt)
+        if len(value) > limit:
+            raise LogError(f'Input exceeds {limit} characters')
+        return value
+
+    def fields():
+        author = ask('Operator label (unverified, max 32): ', 32)
+        title = ask('Title (max 100): ', 100)
+        body = ask('Entry (one line, max 4000): ', 4000)
+        claimed = ask('Claimed time (ISO 8601 with offset; blank = none): ', 64).strip()
+        source = ask('Claimed time source (blank = not supplied): ', 200).strip()
+        uncertainty = ask('Claimed time uncertainty (blank = unknown): ', 200).strip()
+        return author, title, body, dict(claimed_time=claimed or None,
+                                        time_source=source or 'not supplied',
+                                        uncertainty=uncertainty or 'unknown')
+
+    def pages(fetch):
+        number = 1
+        while True:
+            items = fetch(number)
+            output_fn(f'PAGE {number} // receipt order, not proof of occurrence time')
+            if not items:
+                output_fn('No matching log records.')
+            for item in items:
+                display_log(item, output_fn)
+            command = ask('[>] Next [<] Previous [0] Return: ', 1).strip()
+            if command == '0':
+                return
+            if command == '>' and len(items) == 10 and number < 10000:
+                number += 1
+            elif command == '<' and number > 1:
+                number -= 1
+
+    output_fn("CAPTAIN'S LOG // LOCAL ONLY // OPERATORS AND CLOCKS UNVERIFIED")
+    output_fn('Corrections retain originals. Hashes are not signatures. No network.')
+    while True:
+        output_fn('[1] Browse [2] Create [3] History [4] Search all revisions [5] Export [6] Correct [0] Return')
+        try:
+            choice = ask('LOG:// > ', 1).strip()
+            if choice == '0':
+                return
+            if choice == '1':
+                pages(service.browse)
+            elif choice == '2':
+                author, title, body, metadata = fields()
+                eid = service.create(author, title, body, **metadata)
+                output_fn(f'Entry saved: {eid}')
+            elif choice == '3':
+                root = ask('Original entry ID (64 characters): ', 64).strip()
+                pages(lambda number: service.history(root, number))
+            elif choice == '4':
+                query = ask('Search text (max 200): ', 200)
+                pages(lambda number: service.search(query, number))
+            elif choice == '5':
+                target = ask('New export filename (never overwrites, max 1024): ', 1024)
+                if not target.strip() or any(unicodedata.category(ch).startswith('C') for ch in target):
+                    raise LogError('Invalid export filename')
+                service.export(target)
+                output_fn('Archive exported; journal retained.')
+            elif choice == '6':
+                root = ask('Original entry ID: ', 64).strip()
+                previous = ask('Latest event ID from history (stale corrections rejected): ', 64).strip()
+                author, title, body, metadata = fields()
+                reason = ask('Correction reason (max 500): ', 500)
+                eid = service.correct(root, previous, author, title, body, reason, **metadata)
+                output_fn(f'Correction saved: {eid}')
+            else:
+                output_fn('Unknown selection.')
+        except (EOFError, KeyboardInterrupt):
+            output_fn('\nLog console closed.')
+            return
+        except LogError as exc:
+            output_fn(f'Log operation rejected: {safe_text(exc)}')
+
+
 def run(db_path, *, ansi=False, input_fn=input, output_fn=print):
     """Run an interactive local session; never executes OS commands."""
     output_fn(paint(BANNER, ansi))
-    output_fn("RADNET BBS v0.3 // LOCAL DEVELOPMENT // LOCAL POSTING ENABLED")
+    output_fn("RADNET BBS v0.4 // LOCAL DEVELOPMENT // LOCAL POSTING ENABLED")
     output_fn("AUTHORS UNVERIFIED // No authentication or authorization.")
     output_fn("This system is experimental. No network or emergency dispatch.")
     while True:
@@ -180,6 +280,8 @@ def run(db_path, *, ansi=False, input_fn=input, output_fn=print):
         output_fn("")
         if choice == "1":
             interactive_boards(db_path, input_fn, output_fn, ansi)
+        elif choice == "3":
+            interactive_log(db_path, input_fn, output_fn)
         else:
             output_fn(paint(page(choice, db_path), ansi))
 

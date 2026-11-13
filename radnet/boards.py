@@ -1,6 +1,7 @@
 """Local bounded message-board service. Authors are unverified."""
 import json
 import sqlite3
+from contextlib import closing
 from pathlib import Path
 from .core import EventStore
 
@@ -22,7 +23,7 @@ class Boards:
         if not self.path.is_file():
             return []
         try:
-            with sqlite3.connect(f"file:{self.path.resolve()}?mode=ro", uri=True) as db:
+            with closing(sqlite3.connect(self.path.resolve().as_uri() + "?mode=ro", uri=True)) as db:
                 rows = db.execute("SELECT id,envelope FROM events ORDER BY received_seq").fetchall()
             return [(eid, json.loads(data)) for eid, data in rows]
         except (sqlite3.Error, OSError, ValueError) as exc:

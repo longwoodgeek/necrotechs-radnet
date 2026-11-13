@@ -17,15 +17,19 @@ class EventStore:
     def __init__(self, path):
         self.path = str(Path(path))
         self.db = sqlite3.connect(self.path)
-        self.db.execute("PRAGMA foreign_keys=ON")
-        self.db.execute("PRAGMA journal_mode=WAL")
-        self.db.execute("PRAGMA busy_timeout=5000")
-        self.db.execute("""CREATE TABLE IF NOT EXISTS events (
-            id TEXT PRIMARY KEY,
-            envelope TEXT NOT NULL,
-            received_seq INTEGER NOT NULL UNIQUE
-        )""")
-        self.db.commit()
+        try:
+            self.db.execute("PRAGMA foreign_keys=ON")
+            self.db.execute("PRAGMA journal_mode=WAL")
+            self.db.execute("PRAGMA busy_timeout=5000")
+            self.db.execute("""CREATE TABLE IF NOT EXISTS events (
+                id TEXT PRIMARY KEY,
+                envelope TEXT NOT NULL,
+                received_seq INTEGER NOT NULL UNIQUE
+            )""")
+            self.db.commit()
+        except sqlite3.Error:
+            self.db.close()
+            raise
 
     def close(self):
         self.db.close()
