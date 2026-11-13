@@ -2,7 +2,7 @@
 from pathlib import Path
 import sqlite3
 import sys
-import textwrap
+import unicodedata
 
 BANNER = """+----------------------------------------------+
 |          N E C R O T E C H S                 |
@@ -22,6 +22,12 @@ RESET = "\x1b[0m"
 
 def paint(message, ansi=False):
     return f"{GREEN}{message}{RESET}" if ansi else message
+
+
+def safe_text(value, limit=180):
+    # Strip control/format characters, including ANSI ESC, from untrusted event text.
+    cleaned = ''.join(ch if unicodedata.category(ch)[0] != 'C' else ' ' for ch in str(value))
+    return cleaned[:limit]
 
 
 def read_events(db_path, limit=20):
