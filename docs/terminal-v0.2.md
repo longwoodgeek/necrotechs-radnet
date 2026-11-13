@@ -1,4 +1,6 @@
-# RadNet local terminal v0.2 (experimental)
+# RadNet local terminal v0.2 (historical)
+
+This guide describes the original v0.2 milestone. For the current terminal with local posting, see [local boards v0.3](boards-v0.3.md). The read-only session guarantee below does not apply to explicit board creation, posts or replies in v0.3.
 
 The first interactive BBS shell is **local, read-only and offline**. It has no Telnet listener, authentication, federation, Reticulum transport, or emergency dispatch. It never invokes a system shell. The guest interface reads existing SQLite journals in read-only mode and does not create a database.
 

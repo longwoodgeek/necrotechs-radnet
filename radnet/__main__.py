@@ -16,7 +16,7 @@ def main():
     sub.add_parser("list", help="list recent events")
     sub.add_parser("verify", help="check content hashes (not signatures)")
     sub.add_parser("boot", help="display the RadNet startup diagnostics")
-    terminal = sub.add_parser("terminal", help="run local read-only BBS terminal")
+    terminal = sub.add_parser("terminal", help="run local BBS terminal with local posting")
     terminal.add_argument("--plain", action="store_true", help="disable ANSI colors")
     args = p.parse_args()
     if args.command == "boot":
