@@ -17,8 +17,13 @@
 *.dd
 *.map
 *.map.bak
+# Local SQLite journals and their WAL/rollback sidecars
 *.sqlite
+*.sqlite3
 *.db
+*.sqlite-*
+*.sqlite3-*
+*.db-*
 *.csv
 *.pcap
 *.pcapng

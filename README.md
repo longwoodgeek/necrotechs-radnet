@@ -19,6 +19,8 @@ RadNet is an evolving NecroTechs project investigating how small, inexpensive de
 
 **What has NOT been demonstrated:** maximum on-air throughput; guaranteed range; independent FCC compliance certification; emergency-service reliability; fully validated infrastructure failover.
 
+**Local core validation (November 13):** [MacBook Pro report and reproduction steps](docs/validation/2026-11-13-macbook-pro.md): successful boot, first SQLite message by Longwood, retrieval, two content-hash PASS checks, and **12/12 tests** (5 core, 2 boot, 5 LinkProbe) in **0.025s**, using Python 3.14.6 and Git 2.50.1. Local software/simulation evidence only; hashes do not authenticate authors. [Core CLI guide](docs/radnet-core-v0.1.md).
+
 ## Start here
 
 | Topic | Document |
