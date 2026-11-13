@@ -1,4 +1,4 @@
-"""Local, read-only RadNet BBS prototype. No sockets, accounts or shell execution."""
+"""Local RadNet BBS prototype with development posting. No sockets, accounts or shell execution."""
 from pathlib import Path
 import sqlite3
 import sys
@@ -51,7 +51,7 @@ def station_status(db_path):
     events, error = read_events(db_path)
     return "\n".join([
         "STATION STATUS",
-        "Mode: LOCAL / READ-ONLY DEVELOPMENT",
+        "Mode: LOCAL DEVELOPMENT / LOCAL POSTING ENABLED",
         "Transport: NOT CONNECTED",
         "Identity: NOT VERIFIED",
         "Federation: NOT IMPLEMENTED",
@@ -104,7 +104,7 @@ def interactive_boards(db_path, input_fn, output_fn, ansi=False):
     while True:
         try:
             boards = service.boards()
-            output_fn("\\nBOARDS:")
+            output_fn("\nBOARDS:")
             for number, board in enumerate(boards, 1):
                 output_fn(f"[{number}] {safe_text(board['title'], 100)}")
             output_fn("[N] New board  [0] Return")
@@ -124,7 +124,7 @@ def interactive_boards(db_path, input_fn, output_fn, ansi=False):
             page_num = 1
             while True:
                 items = service.messages(selected["id"], page_num)
-                output_fn(f"\\n{safe_text(selected['title'])} // PAGE {page_num}")
+                output_fn(f"\n{safe_text(selected['title'])} // PAGE {page_num}")
                 for number, item in enumerate(items, 1):
                     output_fn(f"[{number}] {safe_text(item['title'], 100)} — {safe_text(item['author'], 32)}")
                 output_fn("[N] New post  [>] Next  [<] Previous  [0] Boards")
@@ -144,7 +144,7 @@ def interactive_boards(db_path, input_fn, output_fn, ansi=False):
                     page_num = 1
                 elif command.isdecimal() and 1 <= int(command) <= len(items):
                     item = items[int(command) - 1]
-                    output_fn(f"\\n{safe_text(item['title'], 100)}")
+                    output_fn(f"\n{safe_text(item['title'], 100)}")
                     output_fn(f"By {safe_text(item['author'], 32)} [UNVERIFIED]")
                     output_fn(safe_text(item["body"], 4000))
                     if input_fn("Reply? [y/N] ").strip().lower() == "y":
@@ -155,7 +155,7 @@ def interactive_boards(db_path, input_fn, output_fn, ansi=False):
                 else:
                     output_fn("Unknown selection.")
         except (EOFError, KeyboardInterrupt):
-            output_fn("\\nBoard console closed.")
+            output_fn("\nBoard console closed.")
             return
         except BoardError as exc:
             output_fn(f"Board operation rejected: {exc}")
@@ -163,7 +163,8 @@ def interactive_boards(db_path, input_fn, output_fn, ansi=False):
 def run(db_path, *, ansi=False, input_fn=input, output_fn=print):
     """Run an interactive local session; never executes OS commands."""
     output_fn(paint(BANNER, ansi))
-    output_fn("RADNET BBS v0.2 // LOCAL DEVELOPMENT // GUEST READ-ONLY")
+    output_fn("RADNET BBS v0.3 // LOCAL DEVELOPMENT // LOCAL POSTING ENABLED")
+    output_fn("AUTHORS UNVERIFIED // No authentication or authorization.")
     output_fn("This system is experimental. No network or emergency dispatch.")
     while True:
         output_fn("")
