@@ -23,6 +23,8 @@ RadNet is an evolving NecroTechs project investigating how small, inexpensive de
 
 **Local boards v0.3:** [Usage, limits and validation](docs/boards-v0.3.md). Board creation, posts and replies are local only, with unverified author labels and no authentication or authorization. The operator reported 22/22 tests and restart/reply persistence on the MacBook; follow-up presentation regressions bring the separately executed development suite to 26 tests. No remote transport or emergency dispatch.
 
+**Captain's Log v0.4:** [Local archival logbook, provenance, limits and validation](docs/captains-log-v0.4.md). Create entries, retain originals through corrections, browse revision history, search all revisions and export without overwriting files. Operator identities and clocks remain unverified; no network transport.
+
 ## Start here
 
 | Topic | Document |
