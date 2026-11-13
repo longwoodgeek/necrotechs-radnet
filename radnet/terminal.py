@@ -177,7 +177,10 @@ def run(db_path, *, ansi=False, input_fn=input, output_fn=print):
             output_fn("Disconnecting. THE NETWORK REMEMBERS.")
             return
         output_fn("")
-        if choice == "1":\n            interactive_boards(db_path, input_fn, output_fn, ansi)\n        else:\n            output_fn(paint(page(choice, db_path), ansi))
+        if choice == "1":
+            interactive_boards(db_path, input_fn, output_fn, ansi)
+        else:
+            output_fn(paint(page(choice, db_path), ansi))
 
 
 if __name__ == "__main__":
