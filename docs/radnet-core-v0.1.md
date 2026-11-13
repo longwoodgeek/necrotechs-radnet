@@ -20,7 +20,7 @@ The database is created only at the specified path (or the default radnet-dev.sq
 - Deterministic SHA-256 content IDs for local event envelopes
 - Parent references (not authenticated or resolved)
 - CLI post/list/verify and read-only boot diagnostics
-- Seven unit tests in the recovered boot-development package
+- Seven core/boot tests in the recovered package (5 core, 2 boot); the repository suite also includes 5 LinkProbe tests: **12 total**
 
 ## Not implemented
 
@@ -32,6 +32,12 @@ The database is created only at the specified path (or the default radnet-dev.sq
 **Security:** hashes are not signatures or tamper-proof evidence. An actor with database write access can rewrite content and hashes. local_seq is local receipt order, not causality or wall-clock order. Append-only is enforced by the application API, not direct SQL.
 
 The boot sequence intentionally reports missing cryptographic identity, federation and AXIS connector. It makes no network connection and does not create a database.
+
+## Validated baseline
+
+[MacBook Pro validation, November 13, 2026](validation/2026-11-13-macbook-pro.md): Python 3.14.6; boot, local persistence/retrieval, two content-hash PASS checks, and 12/12 unittest tests in 0.025s. Timing is an observation, not a test threshold. LinkProbe tests use simulation, not RF.
+
+[Terminal Interface v0.2 preparation](terminal-interface-v0.2-preparation.md) records the next discussion; no interactive interface is implemented.
 
 ## Next milestones
 
