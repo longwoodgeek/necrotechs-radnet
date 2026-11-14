@@ -22,7 +22,7 @@ class CapabilityScreenTests(unittest.TestCase):
             db = Path(td) / "bbs.sqlite3"
             append_evidence(evidence_path(db), "reticulum.local", "pass", "simulation", "unit-test")
             screen = page("7", db)
-            self.assertIn("1 historical observation(s)", screen)
+            self.assertIn("HISTORICAL OBSERVATIONS: 1", screen)
             self.assertIn("LIVE VERIFICATION: NONE", screen)
             listing = evidence_listing(db)
             self.assertIn("simulation", listing)
