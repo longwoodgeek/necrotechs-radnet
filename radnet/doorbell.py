@@ -61,3 +61,12 @@ def serve(db_path, port=0, ready=None, stop=None):
                 continue
             with conn:
                 handle_client(conn, db_path)
+
+if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser(description="Loopback-only RadNet read-only preview")
+    parser.add_argument("--db", default="radnet-dev.sqlite3")
+    parser.add_argument("--port", type=int, default=8765)
+    args = parser.parse_args()
+    print(f"RadNet read-only preview on {HOST}:{args.port} (NO AUTH; LOOPBACK ONLY)", flush=True)
+    serve(args.db, port=args.port)
