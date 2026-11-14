@@ -46,3 +46,13 @@ Design branch opened; implementation and runtime acceptance **not yet completed*
 - No remote-host connectivity, authentication, multiuser concurrency, or posting over the socket has been demonstrated. The listener remains loopback-only.
 
 **Next gate:** review read-only exposure and session framing, then implement a deliberately constrained interactive loopback session with explicit connection limits and tests before any private-network binding.
+
+## Interactive session manual acceptance — 2026-11-14
+- Operator reported **85/85 automated tests OK** on Pi 5.
+- Separate interactive listener on `127.0.0.1:8766` handled a single TCP connection containing menu selections `2`, `7`, then `0`.
+- Screenshot confirms station status, capability registry, repeat-selection prompt, and clean `Disconnected.` response.
+- **Presentation defect observed:** capability registry uses wide two-column rendering despite narrow mobile display, wrapping statuses awkwardly.
+- **Navigation limitation:** `[1] VIEW CAPABILITY EVIDENCE` shown within registry is not an active nested remote menu; current remote protocol only accepts top-level selections.
+- No remote-host connectivity, authenticated user access, or concurrent clients verified.
+
+**Next polish gate:** negotiate or explicitly set client display width; support nested read-only evidence navigation without confusing top-level menu options; test and manually verify before expanding network reach.
