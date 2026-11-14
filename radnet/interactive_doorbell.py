@@ -5,12 +5,20 @@ Distinct from the known-good one-request doorbell. Never expose publicly.
 import argparse
 import socket
 
-from .doorbell import HOST, MAX_LINE, MENU, TIMEOUT
+from .doorbell import HOST, MAX_LINE, TIMEOUT
 from .terminal import page
 from .presentation import render_remote, normalized_width
 
 MAX_SELECTIONS = 20
 MAX_DRAIN = 4096
+
+WELCOME = ("RADNET:// PRIVATE PREVIEW\n"
+           "READ ONLY // NO AUTHENTICATION\n"
+           "LOOPBACK ONLY\n"
+           "[1] BOARDS  [2] STATUS\n"
+           "[3] LOG INFO  [4] RESOURCES\n"
+           "[5] DIRECTORY  [6] EMERGENCY\n"
+           "[7] CAPABILITIES  [0] DISCONNECT\n> ")
 
 
 def send_text(conn, message, width=None):
@@ -46,7 +54,7 @@ def handle_session(conn, db_path, width=None):
     conn.settimeout(TIMEOUT)
     width = normalized_width(width)
     try:
-        send_text(conn, MENU.rstrip(), width)
+        send_text(conn, WELCOME.rstrip(), width)
         for _ in range(MAX_SELECTIONS):
             choice, error = read_selection(conn)
             if error == "eof":
