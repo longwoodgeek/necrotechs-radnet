@@ -13,6 +13,11 @@ class PresentationTests(unittest.TestCase):
         text = render_remote("FIRST LINE\nSECOND LINE", 36)
         self.assertEqual(text, "FIRST LINE\nSECOND LINE\n")
 
+    def test_newlines_are_real_not_literal_escapes(self):
+        rendered = render_remote("FIRST LINE\nSECOND LINE", 36)
+        self.assertNotIn(chr(92) + "n", rendered)
+        self.assertEqual(rendered.count("\n"), 2)
+
     def test_control_characters_removed(self):
         text = render_remote("hello\x1b[31mworld", 36)
         self.assertNotIn("\x1b", text)
