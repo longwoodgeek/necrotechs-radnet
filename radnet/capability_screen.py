@@ -1,5 +1,7 @@
 """Read-only capability dashboard. Historical observations are not live probes."""
 from pathlib import Path
+import shutil
+import textwrap
 from .capabilities import read_evidence, describe_capability, CapabilityError
 
 CAPABILITIES = (
@@ -17,25 +19,56 @@ def evidence_path(db_path):
     return Path(db_path).parent / "radnet-capability-evidence.jsonl"
 
 
-def dashboard(db_path):
-    """Render only supported claims, never probe or create files."""
+def terminal_width(width=None):
+    """Conservative terminal width, injectable for tests and small displays."""
+    if width is None:
+        width = shutil.get_terminal_size(fallback=(80, 24)).columns
+    return max(24, min(int(width), 160))
+
+
+def wrapped(lines, width):
+    """Wrap without cutting meaningful status text or emitting wide lines."""
+    result = []
+    for line in lines:
+        if not line:
+            result.append("")
+        else:
+            result.extend(textwrap.wrap(line, width=width, break_long_words=True,
+                                        break_on_hyphens=False, replace_whitespace=False))
+    return "\\n".join(result)
+
+
+def dashboard(db_path, width=None):
+    """Read-only status view; compact layout for narrow terminal windows."""
+    width = terminal_width(width)
     path = evidence_path(db_path)
-    lines = ["RADNET:// CAPABILITY REGISTRY", "LOCAL / UNVERIFIED // NO LIVE HARDWARE PROBES", ""]
+    lines = ["RADNET:// CAPABILITY REGISTRY",
+             "LOCAL / UNVERIFIED",
+             "NO LIVE HARDWARE PROBES", ""]
     try:
         records = read_evidence(path)
     except (CapabilityError, OSError, UnicodeError):
-        return "\n".join(lines + ["[ERROR] Capability evidence unreadable; no records trusted."])
+        return wrapped(lines + ["[ERROR] Capability evidence unreadable; no records trusted."], width)
     for key, label, baseline in CAPABILITIES:
         observed = describe_capability(records, key)
-        suffix = f" // {observed['observations']} historical observation(s)" if observed["observations"] else ""
-        lines.append(f"{label:<20} {baseline}{suffix}")
-    lines += ["", f"EVIDENCE RECORDS: {len(records)}", "LIVE VERIFICATION: NONE", "[1] VIEW CAPABILITY EVIDENCE  [0] RETURN"]
-    return "\n".join(lines)
+        count = observed["observations"]
+        if width < 72:
+            lines.extend([label, "  " + baseline])
+            if count:
+                lines.append(f"  HISTORICAL OBSERVATIONS: {count}")
+            lines.append("")
+        else:
+            lines.append(f"{label:<20} {baseline}")
+            if count:
+                lines.append(f"  HISTORICAL OBSERVATIONS: {count}")
+    lines += ["", f"EVIDENCE RECORDS: {len(records)}", "LIVE VERIFICATION: NONE",
+              "[1] VIEW CAPABILITY EVIDENCE", "[0] RETURN"]
+    return wrapped(lines, width)
 
-
-def evidence_listing(db_path):
+def evidence_listing(db_path, width=None):
     """Show bounded recent historical records, sanitizing untrusted strings."""
     from .terminal import safe_text
+    width = terminal_width(width)
     try:
         records = read_evidence(evidence_path(db_path))
     except (CapabilityError, OSError, UnicodeError):
@@ -51,4 +84,4 @@ def evidence_listing(db_path):
         )
     if not records:
         lines.append("No evidence recorded.")
-    return "\n".join(lines)
+    return wrapped(lines, width)
