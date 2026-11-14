@@ -74,6 +74,17 @@ class InteractiveDoorbellTests(unittest.TestCase):
         self.assertIn("Returned to main menu.", text)
         self.assertIn("Disconnected.", text)
 
+    def test_nested_navigation_has_single_prompt_per_screen(self):
+        s = self.connect()
+        s.sendall(b"7\n1\n0\n0\n0\n")
+        s.shutdown(socket.SHUT_WR)
+        text = self.receive_all(s)
+        self.assertNotIn("[1] VIEW CAPABILITY EVIDENCE", text)
+        self.assertEqual(text.count("[1] EVIDENCE  [0] RETURN"), 2)
+        self.assertEqual(text.count("[0] RETURN TO REGISTRY"), 1)
+        self.assertNotIn("> > ", text)
+        self.assertIn("Disconnected.", text)
+
     def test_registry_zero_returns_not_disconnects(self):
         s = self.connect()
         s.sendall(b"7\n0\n2\n0\n")
