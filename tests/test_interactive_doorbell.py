@@ -112,6 +112,20 @@ class InteractiveDoorbellTests(unittest.TestCase):
         self.assertIn("STATION STATUS", text)
         self.assertIn("Disconnected.", text)
 
+    def test_main_menu_prompt_not_duplicated(self):
+        s = self.connect()
+        s.sendall(b"0\n")
+        s.shutdown(socket.SHUT_WR)
+        text = self.receive_all(s)
+        self.assertEqual(text.count("[0] DISCONNECT"), 1)
+        self.assertIn("Disconnected.", text)
+
+    def test_interactive_timeout_is_independent(self):
+        from radnet.doorbell import TIMEOUT
+        from radnet.interactive_doorbell import INTERACTIVE_TIMEOUT
+        self.assertEqual(TIMEOUT, 15.0)
+        self.assertEqual(INTERACTIVE_TIMEOUT, 300.0)
+
     def test_shell_looking_input_is_data(self):
         s = self.connect()
         s.sendall(b"$(id)\n0\n")
