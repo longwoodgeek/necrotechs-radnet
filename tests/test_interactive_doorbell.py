@@ -63,6 +63,24 @@ class InteractiveDoorbellTests(unittest.TestCase):
         self.assertTrue(all(len(line) <= 36 for line in text.splitlines()))
         self.assertIn("NOT LIVE-VERIFIED", text)
 
+    def test_read_only_board_post_navigation(self):
+        from radnet.boards import Boards
+        service = Boards(self.db)
+        board_id = service.create_board("General", "SysOp")
+        service.post(board_id, "Longwood", "First Transmission", "The network remembers")
+        s = self.connect()
+        s.sendall(b"1\n1\n1\n0\n0\n0\n0\n")
+        s.shutdown(socket.SHUT_WR)
+        text = self.receive_all(s)
+        self.assertIn("MESSAGE BOARDS // LOCAL", text)
+        self.assertIn("BOARD: General", text)
+        self.assertIn("First Transmission", text)
+        self.assertIn("The network remembers", text)
+        self.assertIn("Returned to main menu.", text)
+        self.assertIn("Disconnected.", text)
+        self.assertTrue(all(len(line) <= 36 for line in text.splitlines()))
+        self.assertEqual(len(service.messages(board_id)), 1)
+
     def test_nested_evidence_and_back_navigation(self):
         s = self.connect()
         s.sendall(b"7\n1\n0\n0\n0\n")
