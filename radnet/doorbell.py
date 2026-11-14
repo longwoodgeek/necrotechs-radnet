@@ -48,7 +48,12 @@ def handle_client(conn, db_path):
                 reply = page(choice, db_path)
             else:
                 reply = "Unknown selection. No commands executed."
-        conn.sendall((safe_text(reply, 8192) + "\n").encode("utf-8"))
+        # Preserve intentional line boundaries while sanitizing each line.
+        # safe_text() strips control characters, including newline itself.
+        clean = "\
+".join(safe_text(line, 8192) for line in reply.splitlines())
+        conn.sendall((clean[:8192] + "\
+").encode("utf-8"))
     except (socket.timeout, BrokenPipeError, ConnectionResetError):
         return
 
