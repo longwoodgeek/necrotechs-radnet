@@ -1,0 +1,63 @@
+"""Experimental loopback-only, read-only RadNet socket preview.
+
+No shell, posting, credentials, or public interface. Not a remote BBS release.
+"""
+import socket
+from .terminal import page, safe_text
+
+HOST = "127.0.0.1"
+MAX_LINE = 64
+TIMEOUT = 15.0
+MENU = ("RADNET:// PRIVATE PREVIEW // READ ONLY\n"
+        "LOCAL LOOPBACK ONLY / NO AUTHENTICATION\n"
+        "[1] BOARDS [2] STATUS [3] LOG INFO [4] RESOURCES\n"
+        "[5] DIRECTORY [6] EMERGENCY INFO [7] CAPABILITIES\n"
+        "[0] DISCONNECT\n> ")
+
+
+def handle_client(conn, db_path):
+    """One bounded request per connection. Never dispatch to shell or writers."""
+    conn.settimeout(TIMEOUT)
+    conn.sendall(MENU.encode("utf-8"))
+    try:
+        data = bytearray()
+        while len(data) <= MAX_LINE:
+            chunk = conn.recv(1)
+            if not chunk or chunk in (b"\n", b"\r"):
+                break
+            data.extend(chunk)
+        if len(data) > MAX_LINE:
+            reply = "Input too long. Disconnected."
+        else:
+            try:
+                choice = data.decode("utf-8").strip()
+            except UnicodeDecodeError:
+                choice = ""
+            if choice == "0":
+                reply = "Disconnected."
+            elif choice in "1234567" and len(choice) == 1:
+                reply = page(choice, db_path)
+            else:
+                reply = "Unknown selection. No commands executed."
+        conn.sendall((safe_text(reply, 8192) + "\n").encode("utf-8"))
+    except (socket.timeout, BrokenPipeError, ConnectionResetError):
+        return
+
+
+def serve(db_path, port=0, ready=None, stop=None):
+    """Bind exclusively to IPv4 loopback. One client at a time."""
+    if not 0 <= port <= 65535:
+        raise ValueError("Invalid port")
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as listener:
+        listener.bind((HOST, port))
+        listener.listen(1)
+        listener.settimeout(0.25)
+        if ready is not None:
+            ready(listener.getsockname()[1])
+        while stop is None or not stop.is_set():
+            try:
+                conn, _ = listener.accept()
+            except socket.timeout:
+                continue
+            with conn:
+                handle_client(conn, db_path)
