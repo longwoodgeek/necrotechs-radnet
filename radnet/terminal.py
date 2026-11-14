@@ -302,6 +302,16 @@ def run(db_path, *, ansi=False, input_fn=input, output_fn=print):
             interactive_boards(db_path, input_fn, output_fn, ansi)
         elif choice == "3":
             interactive_log(db_path, input_fn, output_fn)
+        elif choice == "7":
+            from .capability_screen import evidence_listing
+            output_fn(page(choice, db_path))
+            try:
+                selection = input_fn("CAPABILITY:// > ").strip()
+            except (EOFError, KeyboardInterrupt):
+                output_fn("\nCapability console closed.")
+                return
+            if selection == "1":
+                output_fn(evidence_listing(db_path))
         else:
             output_fn(colorize_status(page(choice, db_path), ansi=ansi) if choice == "2" else paint(page(choice, db_path), ansi))
 
