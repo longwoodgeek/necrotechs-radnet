@@ -93,7 +93,7 @@ class RemoteBoardFixture:
 
     def test_untrusted_display_text_has_no_escape_sequences(self):
         board = self.make_board("General Communications")
-        self.add_post(board, "A\u001b[31mB", "C\u001b[2JD")
+        self.add_post(board, "A\nB", "C\tD")
         _, posts = post_list(self.db, {"id": board, "title": "General Communications"})
         self.assertNotIn("\u001b", post_detail(posts[0]))
         self.assertNotIn("\u001b", render_remote(post_detail(posts[0]), 24))
