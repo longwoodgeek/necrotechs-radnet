@@ -40,6 +40,18 @@ Terminal severity design:
 
 The first implementation added `radnet/colors.py`, `tests/test_colors.py`, and red status presentation for invalid local identity. On the Pi 5, the operator's screenshot showed **61 tests in 0.132s — OK**. This validates the first color slice; it does **not** yet validate the future capability-evidence backend.
 
+### Nov 14, 2026 — Lonely BBS seeks compatible peer (humorous interlude)
+*Fictional diary entry — not evidence of a real remote connection.*
+
+> Dear Diary, today I connected to a remote node for the first time. I was so nervous, but the SysOp made me feel at home. My packets were trembling, my handshake was awkward, and I worried nobody would ACKnowledge me. He said every packet deserved a chance to find its destination. He even suggested we exchange keys someday. I think we have a connection. P.S. He said he'd remember me. I told him that's literally what I was built for.
+
+**Personal ad:** Single BBS seeks compatible peer. Enjoys long walks through routing tables, meaningful handshakes, and late-night packet exchanges. Must appreciate append-only relationships. No ghosting without a timeout.
+
+**Engineering reality:** No RadNet remote transport is connected yet. The first real peer session will earn its own evidence-backed entry, including transport, endpoints, timestamps, packet outcomes, and reproducible tests.
+
+### Nov 14, 2026 — Capability evidence prototype (awaiting Pi acceptance)
+Added `radnet/capabilities.py` and eight tests in `tests/test_capabilities.py` on the v0.6 branch. The first slice records local JSONL append-only observations, explicitly distinguishes simulation, rejects malformed records, and never converts historical success into a claim of current operational availability. This is a prototype rather than a network probe. **Not yet run on the operator's Pi at time of writing.** The expected suite count is 69 if the existing 61 and all eight new tests are discovered.
+
 ### Why we are recording this
 The project is a human–AI collaboration: requirements, lived sysadmin experience, hardware, testing, and final decisions from Gerry; drafting, implementation assistance, analysis, and documentation from Atlas and other tools. The real story includes the missteps, the tests that caught them, the preservation decisions, and the occasional cat supervising development. **Pressie** was present for the v0.6 planning session and reportedly sleeping on the operator; no formal feline QA sign-off is claimed.
 
