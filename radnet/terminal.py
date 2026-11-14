@@ -52,19 +52,22 @@ def station_status(db_path):
     from .station import load, StationError
     events, error = read_events(db_path)
     identity_path = Path(db_path).parent / "radnet-station.json"
+    identification = "NOT CONFIGURED"
     try:
         identity = load(identity_path)
         if identity is None:
             station_lines = ["Station identity: NOT CONFIGURED"]
         else:
+            identification = "PRESENT (LOCAL / UNVERIFIED)"
             station_lines = [f"Station: {safe_text(identity['label'], 64)} [LOCAL CONFIGURATION ONLY]",
                              f"Station ID: {identity['station_id']}"]
     except StationError:
+        identification = "INVALID / UNREADABLE"
         station_lines = ["Station identity: INVALID / UNREADABLE"]
     return "\n".join([
         "NECROTECHS RADNET // STATION STATUS v0.5",
         *station_lines,
-        "IDENTIFICATION: " + ("PRESENT" if identity_path.is_file() else "NOT CONFIGURED"),
+        "IDENTIFICATION: " + identification,
         "DRINKING PRIVILEGES: DENIED (station policy: no beverages near hardware)",
         "NETWORK CONNECTIVITY: NOT VERIFIED",
         "Mode: LOCAL DEVELOPMENT / LOCAL POSTING ENABLED",
