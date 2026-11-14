@@ -54,6 +54,15 @@ class InteractiveDoorbellTests(unittest.TestCase):
         self.assertIn("Disconnected.", text)
         self.assertFalse(Path(self.db).exists())
 
+    def test_remote_capability_output_uses_compact_width(self):
+        s = self.connect()
+        s.sendall(b"7\n0\n")
+        s.shutdown(socket.SHUT_WR)
+        text = self.receive_all(s)
+        self.assertIn("CAPABILITY REGISTRY", text)
+        self.assertTrue(all(len(line) <= 36 for line in text.splitlines()))
+        self.assertIn("NOT LIVE-VERIFIED", text)
+
     def test_shell_looking_input_is_data(self):
         s = self.connect()
         s.sendall(b"$(id)\n0\n")
