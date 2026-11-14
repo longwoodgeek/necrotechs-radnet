@@ -56,3 +56,13 @@ Design branch opened; implementation and runtime acceptance **not yet completed*
 - No remote-host connectivity, authenticated user access, or concurrent clients verified.
 
 **Next polish gate:** negotiate or explicitly set client display width; support nested read-only evidence navigation without confusing top-level menu options; test and manually verify before expanding network reach.
+
+## Nested navigation acceptance — operator log (2026-11-14)
+- Operator reported **93/93 automated tests OK**.
+- Supplied complete 92-line TCP session log (`nav.log`) showing `MAIN → REGISTRY → EVIDENCE → REGISTRY → MAIN → DISCONNECT` with a single connection.
+- Registry displays honest local/unverified capabilities; evidence view says `No evidence recorded.`
+- Output remains within the configured compact 36-column presentation.
+- **Polish issues:** duplicate `[0] RETURN` / evidence-navigation prompts after nested screens; extra main-menu prompt after returning to main. These are presentation defects, not navigation failures.
+- Log does not establish authenticated access, remote-host access, concurrent clients, or any live radio transport.
+
+**Next:** remove duplicate prompts without changing menu state semantics; add focused tests.
