@@ -1,8 +1,8 @@
 """Read-only capability dashboard. Historical observations are not live probes."""
 from pathlib import Path
 import shutil
-import textwrap
 from .capabilities import read_evidence, describe_capability, CapabilityError
+from .presentation import wrap_lines
 
 CAPABILITIES = (
     ("archive.local", "LOCAL ARCHIVE", "LOCAL SOFTWARE / NOT LIVE-VERIFIED"),
@@ -27,15 +27,7 @@ def terminal_width(width=None):
 
 
 def wrapped(lines, width):
-    """Wrap without cutting meaningful status text or emitting wide lines."""
-    result = []
-    for line in lines:
-        if not line:
-            result.append("")
-        else:
-            result.extend(textwrap.wrap(line, width=width, break_long_words=True,
-                                        break_on_hyphens=False, replace_whitespace=False))
-    return "\n".join(result)
+    return wrap_lines(lines, width)
 
 
 def dashboard(db_path, width=None):
