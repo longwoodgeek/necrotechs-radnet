@@ -71,7 +71,7 @@ def handle_session(conn, db_path, width=None):
             if len(choice) == 1 and choice in "1234567":
                 send_text(conn, page(choice, db_path), width)
             else:
-                send_text(conn, "Unknown selection. No commands executed.", width)
+                send_text(conn, "Unknown selection.\nNo commands executed.", width)
             conn.sendall(b"\n[0] DISCONNECT  [1-7] SELECT AGAIN\n> ")
         send_text(conn, "Session limit reached. Disconnected.", width)
     except (socket.timeout, BrokenPipeError, ConnectionResetError):
