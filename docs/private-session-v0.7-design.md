@@ -24,3 +24,15 @@ Loopback connect/disconnect; malformed and oversized input; unauthorized attempt
 Design branch opened; implementation and runtime acceptance **not yet completed**.
 
 > Dear Diary: The SysOp says I may finally get a doorbell. Apparently I must learn not to let strangers into the server room.
+
+## Baseline acceptance — 2026-11-14 (operator report)
+- On Raspberry Pi 5, the existing **75-test** regression suite completed with **OK** after switching to the v0.7 branch.
+- During an earlier local-terminal session, a complete shell command was accidentally pasted at the BBS prompt; the operator observed that RadNet did not execute it.
+- This is a useful negative observation, **not** a comprehensive shell-injection or remote-session security assessment. Exact pasted bytes and complete terminal trace were not retained in this record.
+
+## Security regression requirements arising from accidental paste
+- Submit literal shell-looking input at the menu prompt and verify no OS command or subprocess is invoked.
+- Include metacharacters, command substitution, oversized input, escape/control sequences, and EOF.
+- Confirm malformed input cannot change station identity or append to the archive.
+- Repeat against the proposed network session protocol, not only the local interactive menu.
+- No test should run an actual destructive command; use mocks or harmless marker files to detect execution attempts.
