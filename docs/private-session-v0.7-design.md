@@ -66,3 +66,11 @@ Design branch opened; implementation and runtime acceptance **not yet completed*
 - Log does not establish authenticated access, remote-host access, concurrent clients, or any live radio transport.
 
 **Next:** remove duplicate prompts without changing menu state semantics; add focused tests.
+
+## Migration Flight Three — prompt polish acceptance (2026-11-14)
+- Operator confirmed **94/94 automated tests OK**.
+- Operator supplied 85-line `nav2.log` for the loopback TCP navigation tour.
+- Observed `MAIN → REGISTRY → EVIDENCE → REGISTRY → MAIN → DISCONNECT`; nested menu hints appear once per screen, with clean return/disconnect behavior.
+- Registry accurately says `LOCAL / UNVERIFIED`, `NO LIVE HARDWARE PROBES`, and `EVIDENCE RECORDS: 0`; evidence screen says `No evidence recorded.`
+- **Follow-up:** the initial welcome `>` prompt is absent from this log, possibly consumed by the test client's initial socket read. Check with a client that captures the welcome and session as one stream before claiming full prompt visual acceptance.
+- No claim of remote network access, authentication, live LoRa/Reticulum, or writes.
