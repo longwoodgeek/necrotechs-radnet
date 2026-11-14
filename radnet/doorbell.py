@@ -7,6 +7,7 @@ from .terminal import page, safe_text
 
 HOST = "127.0.0.1"
 MAX_LINE = 64
+MAX_DRAIN = 4096
 TIMEOUT = 15.0
 MENU = ("RADNET:// PRIVATE PREVIEW // READ ONLY\n"
         "LOCAL LOOPBACK ONLY / NO AUTHENTICATION\n"
@@ -27,6 +28,14 @@ def handle_client(conn, db_path):
                 break
             data.extend(chunk)
         if len(data) > MAX_LINE:
+            # Drain a bounded remainder to avoid an unread-data TCP reset
+            # swallowing the rejection on Linux.
+            drained = 0
+            while drained < MAX_DRAIN:
+                chunk = conn.recv(min(256, MAX_DRAIN - drained))
+                if not chunk or b"\n" in chunk or b"\r" in chunk:
+                    break
+                drained += len(chunk)
             reply = "Input too long. Disconnected."
         else:
             try:
