@@ -4,6 +4,7 @@ import sqlite3
 from contextlib import closing
 import sys
 import unicodedata
+from .colors import colorize_status
 
 BANNER = """+----------------------------------------------+
 |          N E C R O T E C H S                 |
@@ -302,7 +303,7 @@ def run(db_path, *, ansi=False, input_fn=input, output_fn=print):
         elif choice == "3":
             interactive_log(db_path, input_fn, output_fn)
         else:
-            output_fn(paint(page(choice, db_path), ansi))
+            output_fn(colorize_status(paint(page(choice, db_path), ansi), ansi=ansi) if choice == "2" else paint(page(choice, db_path), ansi))
 
 
 if __name__ == "__main__":
