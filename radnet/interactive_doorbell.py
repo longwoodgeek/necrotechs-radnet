@@ -6,15 +6,15 @@ import argparse
 import socket
 
 from .doorbell import HOST, MAX_LINE, MENU, TIMEOUT
-from .terminal import page, safe_text
+from .terminal import page
+from .presentation import render_remote, normalized_width
 
 MAX_SELECTIONS = 20
 MAX_DRAIN = 4096
 
 
-def send_text(conn, message):
-    clean = "\n".join(safe_text(line, 8192) for line in message.splitlines())
-    conn.sendall((clean[:8192] + "\n").encode("utf-8"))
+def send_text(conn, message, width=None):
+    conn.sendall(render_remote(message, width).encode("utf-8"))
 
 
 def read_selection(conn):
@@ -41,35 +41,36 @@ def read_selection(conn):
         return None, "invalid"
 
 
-def handle_session(conn, db_path):
+def handle_session(conn, db_path, width=None):
     """One client at a time; finite session; no write or subprocess paths."""
     conn.settimeout(TIMEOUT)
+    width = normalized_width(width)
     try:
-        send_text(conn, MENU.rstrip())
+        send_text(conn, MENU.rstrip(), width)
         for _ in range(MAX_SELECTIONS):
             choice, error = read_selection(conn)
             if error == "eof":
                 return
             if error == "oversized":
-                send_text(conn, "Input too long. Disconnected.")
+                send_text(conn, "Input too long. Disconnected.", width)
                 return
             if error == "invalid":
-                send_text(conn, "Invalid encoding. Disconnected.")
+                send_text(conn, "Invalid encoding. Disconnected.", width)
                 return
             if choice == "0":
-                send_text(conn, "Disconnected.")
+                send_text(conn, "Disconnected.", width)
                 return
             if len(choice) == 1 and choice in "1234567":
-                send_text(conn, page(choice, db_path))
+                send_text(conn, page(choice, db_path), width)
             else:
-                send_text(conn, "Unknown selection. No commands executed.")
+                send_text(conn, "Unknown selection. No commands executed.", width)
             conn.sendall(b"\n[0] DISCONNECT  [1-7] SELECT AGAIN\n> ")
-        send_text(conn, "Session limit reached. Disconnected.")
+        send_text(conn, "Session limit reached. Disconnected.", width)
     except (socket.timeout, BrokenPipeError, ConnectionResetError):
         return
 
 
-def serve(db_path, port=0, ready=None, stop=None):
+def serve(db_path, port=0, ready=None, stop=None, width=None):
     """Only IPv4 loopback; serial connections; no background worker threads."""
     if not 0 <= port <= 65535:
         raise ValueError("Invalid port")
@@ -86,13 +87,14 @@ def serve(db_path, port=0, ready=None, stop=None):
             except socket.timeout:
                 continue
             with conn:
-                handle_session(conn, db_path)
+                handle_session(conn, db_path, width)
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Experimental interactive RadNet loopback preview")
     parser.add_argument("--db", default="radnet-dev.sqlite3")
     parser.add_argument("--port", type=int, default=8766)
+    parser.add_argument("--width", type=int, default=36, help="client display columns (24-160)")
     args = parser.parse_args()
     print(f"RadNet interactive preview on {HOST}:{args.port} (READ ONLY; NO AUTH)", flush=True)
-    serve(args.db, args.port)
+    serve(args.db, args.port, width=args.width)
