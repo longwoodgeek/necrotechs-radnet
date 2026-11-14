@@ -36,3 +36,13 @@ Design branch opened; implementation and runtime acceptance **not yet completed*
 - Confirm malformed input cannot change station identity or append to the archive.
 - Repeat against the proposed network session protocol, not only the local interactive menu.
 - No test should run an actual destructive command; use mocks or harmless marker files to detect execution attempts.
+
+## Loopback implementation acceptance — 2026-11-14 (operator screenshots)
+- Added read-only, one-request TCP preview bound to `127.0.0.1`, with bounded menu input and no shell or write handlers.
+- Initial 80-test run found one Linux TCP reset when rejecting oversized input. Implemented bounded draining of the remaining input; subsequent **80/80** tests passed.
+- Operator launched listener in a detached tmux session and connected from a second shell to `127.0.0.1:8765`; menu selection `2` returned the expected persistent station status.
+- First manually observed response flattened line breaks; updated sanitization to preserve line boundaries and added a regression test.
+- Operator's latest screenshot shows **81 tests / OK**, successful second loopback request, and legible multiline station status.
+- No remote-host connectivity, authentication, multiuser concurrency, or posting over the socket has been demonstrated. The listener remains loopback-only.
+
+**Next gate:** review read-only exposure and session framing, then implement a deliberately constrained interactive loopback session with explicit connection limits and tests before any private-network binding.
