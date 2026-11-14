@@ -78,7 +78,7 @@ def handle_session(conn, db_path, width=None, idle_timeout=INTERACTIVE_TIMEOUT):
     revision_records = []
     revision_page = 1
     try:
-        send_text(conn, WELCOME, width)
+        send_text(conn, WELCOME + "\n> ", width)
         for _ in range(MAX_SELECTIONS):
             choice, error = read_selection(conn)
             if error == "eof":
@@ -113,7 +113,7 @@ def handle_session(conn, db_path, width=None, idle_timeout=INTERACTIVE_TIMEOUT):
             elif screen == "boards":
                 if choice == "0":
                     screen = "main"
-                    send_text(conn, "Returned to main menu.\n" + WELCOME.split("\n> ")[0], width)
+                    send_text(conn, "Returned to main menu.\n" + WELCOME, width)
                 elif choice.isascii() and choice.isdecimal() and 1 <= int(choice) <= len(boards):
                     selected_board = boards[int(choice) - 1]
                     page_number = 1
