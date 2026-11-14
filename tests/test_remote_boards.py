@@ -12,7 +12,7 @@ from radnet.remote_boards import board_list, post_list, post_detail
 from radnet.presentation import render_remote
 
 
-class RemoteBoardTests(unittest.TestCase):
+class RemoteBoardFixture:
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
@@ -116,7 +116,11 @@ class RemoteBoardTests(unittest.TestCase):
         self.assertEqual(before, hashlib.sha256(self.db.read_bytes()).hexdigest())
 
 
-class RemoteBoardSessionTests(RemoteBoardTests):
+class RemoteBoardTests(RemoteBoardFixture, unittest.TestCase):
+    pass
+
+
+class RemoteBoardSessionTests(RemoteBoardFixture, unittest.TestCase):
     def setUp(self):
         super().setUp()
         self.stop = threading.Event()
