@@ -120,9 +120,12 @@ class RemoteBoardTests(RemoteBoardFixture, unittest.TestCase):
     pass
 
 
-class RemoteBoardSessionTests(RemoteBoardFixture, unittest.TestCase):
+class RemoteBoardSessionTests(unittest.TestCase):
+    make_board = RemoteBoardFixture.make_board
+    add_post = RemoteBoardFixture.add_post
+
     def setUp(self):
-        super().setUp()
+        RemoteBoardFixture.setUp(self)
         self.stop = threading.Event()
         self.ready = threading.Event()
         self.port = None
