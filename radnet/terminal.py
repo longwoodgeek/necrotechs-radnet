@@ -303,7 +303,7 @@ def run(db_path, *, ansi=False, input_fn=input, output_fn=print):
         elif choice == "3":
             interactive_log(db_path, input_fn, output_fn)
         else:
-            output_fn(colorize_status(paint(page(choice, db_path), ansi), ansi=ansi) if choice == "2" else paint(page(choice, db_path), ansi))
+            output_fn(colorize_status(page(choice, db_path), ansi=ansi) if choice == "2" else paint(page(choice, db_path), ansi))
 
 
 if __name__ == "__main__":
