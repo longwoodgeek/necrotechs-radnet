@@ -46,7 +46,7 @@ class InteractiveDoorbellTests(unittest.TestCase):
 
     def test_multiple_selections_same_connection(self):
         s = self.connect()
-        s.sendall(b"2\n7\n0\n")
+        s.sendall(b"2\n7\n0\n0\n")
         s.shutdown(socket.SHUT_WR)
         text = self.receive_all(s)
         self.assertIn("STATION STATUS", text)
@@ -56,12 +56,32 @@ class InteractiveDoorbellTests(unittest.TestCase):
 
     def test_remote_capability_output_uses_compact_width(self):
         s = self.connect()
-        s.sendall(b"7\n0\n")
+        s.sendall(b"7\n0\n0\n")
         s.shutdown(socket.SHUT_WR)
         text = self.receive_all(s)
         self.assertIn("CAPABILITY REGISTRY", text)
         self.assertTrue(all(len(line) <= 36 for line in text.splitlines()))
         self.assertIn("NOT LIVE-VERIFIED", text)
+
+    def test_nested_evidence_and_back_navigation(self):
+        s = self.connect()
+        s.sendall(b"7\n1\n0\n0\n0\n")
+        s.shutdown(socket.SHUT_WR)
+        text = self.receive_all(s)
+        self.assertIn("CAPABILITY EVIDENCE", text)
+        self.assertIn("No evidence recorded.", text)
+        self.assertGreaterEqual(text.count("CAPABILITY REGISTRY"), 2)
+        self.assertIn("Returned to main menu.", text)
+        self.assertIn("Disconnected.", text)
+
+    def test_registry_zero_returns_not_disconnects(self):
+        s = self.connect()
+        s.sendall(b"7\n0\n2\n0\n")
+        s.shutdown(socket.SHUT_WR)
+        text = self.receive_all(s)
+        self.assertIn("Returned to main menu.", text)
+        self.assertIn("STATION STATUS", text)
+        self.assertIn("Disconnected.", text)
 
     def test_shell_looking_input_is_data(self):
         s = self.connect()
