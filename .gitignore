@@ -33,3 +33,7 @@ __pycache__/
 .pytest_cache/
 .venv/
 venv/
+
+# Local station configuration and non-destructive exports
+radnet-station.json
+radnet-*-export.json
