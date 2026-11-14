@@ -10,6 +10,7 @@ from .terminal import page
 from .presentation import render_remote, normalized_width
 from .capability_screen import dashboard, evidence_listing
 from .remote_boards import board_list, post_list, post_detail
+from .remote_log import entries, detail, revisions
 
 MAX_SELECTIONS = 20
 MAX_DRAIN = 4096
@@ -67,6 +68,11 @@ def handle_session(conn, db_path, width=None):
     posts = []
     selected_board = None
     page_number = 1
+    log_page = 1
+    log_records = []
+    selected_log = None
+    revision_records = []
+    revision_page = 1
     try:
         send_text(conn, WELCOME.split("\n> ")[0], width)
         for _ in range(MAX_SELECTIONS):
@@ -88,10 +94,15 @@ def handle_session(conn, db_path, width=None):
                     screen = "boards"
                     body, boards = board_list(db_path)
                     send_text(conn, body, width)
+                elif choice == "3":
+                    screen = "log"
+                    log_page = 1
+                    body, log_records = entries(db_path, log_page)
+                    send_text(conn, body, width)
                 elif choice == "7":
                     screen = "registry"
                     send_text(conn, registry_body(db_path, width), width)
-                elif len(choice) == 1 and choice in "23456":
+                elif len(choice) == 1 and choice in "2456":
                     send_text(conn, page(choice, db_path), width)
                 else:
                     send_text(conn, "Unknown selection.\nNo commands executed.", width)
@@ -132,6 +143,60 @@ def handle_session(conn, db_path, width=None):
                     send_text(conn, body, width)
                 else:
                     send_text(conn, "Unknown selection.\nNo commands executed.", width)
+            elif screen == "log":
+                if choice == "0":
+                    screen = "main"
+                    send_text(conn, "Returned to main menu.\n" + WELCOME.split("\n> ")[0], width)
+                elif choice == ">" and len(log_records) == 10 and log_page < 10000:
+                    log_page += 1
+                    body, log_records = entries(db_path, log_page)
+                    send_text(conn, body, width)
+                elif choice == "<" and log_page > 1:
+                    log_page -= 1
+                    body, log_records = entries(db_path, log_page)
+                    send_text(conn, body, width)
+                elif choice.isascii() and choice.isdecimal() and 1 <= int(choice) <= len(log_records):
+                    selected_log = log_records[int(choice) - 1]
+                    screen = "log_detail"
+                    send_text(conn, detail(selected_log), width)
+                else:
+                    send_text(conn, "Unknown selection.\nNo commands executed.", width)
+            elif screen == "log_detail":
+                if choice == "0":
+                    screen = "log"
+                    body, log_records = entries(db_path, log_page)
+                    send_text(conn, body, width)
+                elif choice.lower() == "h":
+                    screen = "log_history"
+                    revision_page = 1
+                    body, revision_records = revisions(db_path, selected_log["entry_id"], revision_page)
+                    send_text(conn, body, width)
+                else:
+                    send_text(conn, "Unknown selection.\nNo commands executed.", width)
+            elif screen == "log_history":
+                if choice == "0":
+                    screen = "log_detail"
+                    send_text(conn, detail(selected_log), width)
+                elif choice == ">" and len(revision_records) == 10 and revision_page < 10000:
+                    revision_page += 1
+                    body, revision_records = revisions(db_path, selected_log["entry_id"], revision_page)
+                    send_text(conn, body, width)
+                elif choice == "<" and revision_page > 1:
+                    revision_page -= 1
+                    body, revision_records = revisions(db_path, selected_log["entry_id"], revision_page)
+                    send_text(conn, body, width)
+                elif choice.isascii() and choice.isdecimal() and 1 <= int(choice) <= len(revision_records):
+                    screen = "log_revision"
+                    send_text(conn, detail(revision_records[int(choice) - 1]), width)
+                else:
+                    send_text(conn, "Unknown selection.\nNo commands executed.", width)
+            elif screen == "log_revision":
+                if choice == "0":
+                    screen = "log_history"
+                    body, revision_records = revisions(db_path, selected_log["entry_id"], revision_page)
+                    send_text(conn, body, width)
+                else:
+                    send_text(conn, "Unknown selection.\nNo commands executed.", width)
             elif screen == "registry":
                 if choice == "0":
                     screen = "main"
@@ -156,6 +221,14 @@ def handle_session(conn, db_path, width=None):
                 prompt = "[1-9] POST  [< >] PAGE  [0] BACK\n> "
             elif screen == "post":
                 prompt = "[0] BACK TO POSTS\n> "
+            elif screen == "log":
+                prompt = "[1-9] ENTRY [< >] PAGE [0] BACK\n> "
+            elif screen == "log_detail":
+                prompt = "[H] HISTORY [0] BACK\n> "
+            elif screen == "log_history":
+                prompt = "[1-9] REV [< >] PAGE [0] BACK\n> "
+            elif screen == "log_revision":
+                prompt = "[0] BACK TO HISTORY\n> "
             elif screen == "registry":
                 prompt = "[1] EVIDENCE  [0] RETURN\n> "
             else:
