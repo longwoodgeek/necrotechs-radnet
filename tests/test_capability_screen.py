@@ -3,7 +3,7 @@ import unittest
 from pathlib import Path
 from radnet.terminal import page, run
 from radnet.capabilities import append_evidence
-from radnet.capability_screen import evidence_listing, evidence_path
+from radnet.capability_screen import evidence_listing, evidence_path, dashboard
 
 
 class CapabilityScreenTests(unittest.TestCase):
@@ -45,6 +45,23 @@ class CapabilityScreenTests(unittest.TestCase):
             self.assertIn("CAPABILITY REGISTRY", rendered)
             self.assertIn("No evidence recorded.", rendered)
             self.assertFalse(db.exists())
+
+    def test_compact_dashboard_respects_width_and_keeps_disclosures(self):
+        with tempfile.TemporaryDirectory() as td:
+            db = Path(td) / "missing.sqlite3"
+            output = dashboard(db, width=36)
+            self.assertTrue(all(len(line) <= 36 for line in output.splitlines()))
+            self.assertIn("LOCAL ARCHIVE", output)
+            self.assertIn("NOT LIVE-VERIFIED", output)
+            self.assertIn("LIVE VERIFICATION: NONE", output)
+            self.assertFalse(db.exists())
+
+    def test_wide_dashboard_and_evidence_view_respect_width(self):
+        with tempfile.TemporaryDirectory() as td:
+            db = Path(td) / "missing.sqlite3"
+            for width in (24, 44, 80):
+                self.assertTrue(all(len(line) <= width for line in dashboard(db, width).splitlines()))
+                self.assertTrue(all(len(line) <= width for line in evidence_listing(db, width).splitlines()))
 
 
 if __name__ == "__main__":
