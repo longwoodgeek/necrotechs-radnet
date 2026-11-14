@@ -14,7 +14,7 @@ BANNER = """+----------------------------------------------+
 
 MENU = """[1] MESSAGE BOARDS       [2] STATION STATUS
 [3] CAPTAIN'S LOG        [4] COMMUNITY RESOURCES
-[5] NETWORK DIRECTORY    [6] EMERGENCY INFORMATION
+[5] NETWORK DIRECTORY    [6] EMERGENCY INFORMATION\n[7] CAPABILITY REGISTRY
 [0] DISCONNECT"""
 
 # ANSI is optional; plain mode remains readable on minimal terminals.
@@ -108,12 +108,12 @@ def page(choice, db_path):
         return "COMMUNITY RESOURCES\nComing soon. No external resources have been verified."
     if choice == "5":
         return "NETWORK DIRECTORY\nNot connected. No peers or routes are being discovered."
-    if choice == "6":
+    if choice == "7":\n        from .capability_screen import dashboard\n        return dashboard(db_path)\n    if choice == "6":
         return ("EMERGENCY INFORMATION\n"
                 "PROTOTYPE ONLY — NOT AN EMERGENCY SERVICE.\n"
                 "This terminal cannot request, confirm, or dispatch assistance.\n"
                 "For immediate danger, use your local emergency services.")
-    return "Unknown command. Choose 0 through 6."
+    return "Unknown command. Choose 0 through 7."
 
 
 
