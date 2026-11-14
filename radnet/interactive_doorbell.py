@@ -8,6 +8,7 @@ import socket
 from .doorbell import HOST, MAX_LINE, TIMEOUT
 from .terminal import page
 from .presentation import render_remote, normalized_width
+from .capability_screen import dashboard, evidence_listing
 
 MAX_SELECTIONS = 20
 MAX_DRAIN = 4096
@@ -50,9 +51,10 @@ def read_selection(conn):
 
 
 def handle_session(conn, db_path, width=None):
-    """One client at a time; finite session; no write or subprocess paths."""
+    """Finite read-only session with explicit per-client navigation state."""
     conn.settimeout(TIMEOUT)
     width = normalized_width(width)
+    screen = "main"
     try:
         send_text(conn, WELCOME.rstrip(), width)
         for _ in range(MAX_SELECTIONS):
@@ -65,14 +67,41 @@ def handle_session(conn, db_path, width=None):
             if error == "invalid":
                 send_text(conn, "Invalid encoding. Disconnected.", width)
                 return
-            if choice == "0":
-                send_text(conn, "Disconnected.", width)
-                return
-            if len(choice) == 1 and choice in "1234567":
-                send_text(conn, page(choice, db_path), width)
+
+            if screen == "main":
+                if choice == "0":
+                    send_text(conn, "Disconnected.", width)
+                    return
+                if choice == "7":
+                    screen = "registry"
+                    send_text(conn, dashboard(db_path, width), width)
+                elif len(choice) == 1 and choice in "123456":
+                    send_text(conn, page(choice, db_path), width)
+                else:
+                    send_text(conn, "Unknown selection.\nNo commands executed.", width)
+            elif screen == "registry":
+                if choice == "0":
+                    screen = "main"
+                    send_text(conn, "Returned to main menu.\n" + WELCOME.rstrip(), width)
+                elif choice == "1":
+                    screen = "evidence"
+                    send_text(conn, evidence_listing(db_path, width) + "\n[0] RETURN", width)
+                else:
+                    send_text(conn, "Unknown selection.\nNo commands executed.", width)
+            elif screen == "evidence":
+                if choice == "0":
+                    screen = "registry"
+                    send_text(conn, dashboard(db_path, width), width)
+                else:
+                    send_text(conn, "Unknown selection.\nNo commands executed.", width)
+
+            if screen == "main":
+                prompt = "[0] DISCONNECT  [1-7] SELECT\n> "
+            elif screen == "registry":
+                prompt = "[1] EVIDENCE  [0] RETURN\n> "
             else:
-                send_text(conn, "Unknown selection.\nNo commands executed.", width)
-            conn.sendall(b"\n[0] DISCONNECT  [1-7] SELECT AGAIN\n> ")
+                prompt = "[0] RETURN TO REGISTRY\n> "
+            send_text(conn, prompt.rstrip(), width)
         send_text(conn, "Session limit reached. Disconnected.", width)
     except (socket.timeout, BrokenPipeError, ConnectionResetError):
         return
