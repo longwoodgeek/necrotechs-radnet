@@ -20,7 +20,7 @@ class StationIdentityTests(unittest.TestCase):
     def test_bad_labels_rejected_without_creating_file(self):
         with TemporaryDirectory() as tmp:
             path = Path(tmp) / "station.json"
-            for label in ("", "x" * 65, "bad\\nlabel", 42):
+            for label in ("", "x" * 65, "bad\nlabel", 42):
                 with self.subTest(label=label):
                     with self.assertRaises(StationError):
                         initialize(path, label)
