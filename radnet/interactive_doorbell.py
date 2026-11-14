@@ -5,7 +5,11 @@ Distinct from the known-good one-request doorbell. Never expose publicly.
 import argparse
 import socket
 
-from .doorbell import HOST, MAX_LINE, TIMEOUT
+from .doorbell import HOST, MAX_LINE
+
+# Interactive reading sessions have their own timeout; the one-shot
+# Doorbell remains deliberately short-lived.
+INTERACTIVE_TIMEOUT = 300.0
 from .terminal import page
 from .presentation import render_remote, normalized_width
 from .capability_screen import dashboard, evidence_listing
@@ -21,7 +25,7 @@ WELCOME = ("RADNET:// PRIVATE PREVIEW\n"
            "[1] BOARDS  [2] STATUS\n"
            "[3] LOG INFO  [4] RESOURCES\n"
            "[5] DIRECTORY  [6] EMERGENCY\n"
-           "[7] CAPABILITIES  [0] DISCONNECT\n> ")
+           "[7] CAPABILITIES  [0] DISCONNECT")
 
 
 def send_text(conn, message, width=None):
@@ -59,9 +63,9 @@ def registry_body(db_path, width):
     )
 
 
-def handle_session(conn, db_path, width=None):
+def handle_session(conn, db_path, width=None, idle_timeout=INTERACTIVE_TIMEOUT):
     """Finite read-only session with explicit per-client navigation state."""
-    conn.settimeout(TIMEOUT)
+    conn.settimeout(idle_timeout)
     width = normalized_width(width)
     screen = "main"
     boards = []
@@ -74,7 +78,7 @@ def handle_session(conn, db_path, width=None):
     revision_records = []
     revision_page = 1
     try:
-        send_text(conn, WELCOME.split("\n> ")[0], width)
+        send_text(conn, WELCOME, width)
         for _ in range(MAX_SELECTIONS):
             choice, error = read_selection(conn)
             if error == "eof":
@@ -214,7 +218,7 @@ def handle_session(conn, db_path, width=None):
                     send_text(conn, "Unknown selection.\nNo commands executed.", width)
 
             if screen == "main":
-                prompt = "[0] DISCONNECT  [1-7] SELECT\n> "
+                prompt = "> "
             elif screen == "boards":
                 prompt = "[1-9] BOARD  [0] MAIN\n> "
             elif screen == "posts":
@@ -239,7 +243,7 @@ def handle_session(conn, db_path, width=None):
         return
 
 
-def serve(db_path, port=0, ready=None, stop=None, width=None):
+def serve(db_path, port=0, ready=None, stop=None, width=None, idle_timeout=INTERACTIVE_TIMEOUT):
     """Only IPv4 loopback; serial connections; no background worker threads."""
     if not 0 <= port <= 65535:
         raise ValueError("Invalid port")
@@ -256,7 +260,7 @@ def serve(db_path, port=0, ready=None, stop=None, width=None):
             except socket.timeout:
                 continue
             with conn:
-                handle_session(conn, db_path, width)
+                handle_session(conn, db_path, width, idle_timeout)
 
 
 if __name__ == "__main__":
@@ -264,6 +268,9 @@ if __name__ == "__main__":
     parser.add_argument("--db", default="radnet-dev.sqlite3")
     parser.add_argument("--port", type=int, default=8766)
     parser.add_argument("--width", type=int, default=36, help="client display columns (24-160)")
+    parser.add_argument("--idle-timeout", type=float, default=INTERACTIVE_TIMEOUT, help="socket idle timeout in seconds (default: 300)")
     args = parser.parse_args()
     print(f"RadNet interactive preview on {HOST}:{args.port} (READ ONLY; NO AUTH)", flush=True)
-    serve(args.db, args.port, width=args.width)
+    if not 1 <= args.idle_timeout <= 86400:
+        parser.error("--idle-timeout must be between 1 and 86400 seconds")
+    serve(args.db, args.port, width=args.width, idle_timeout=args.idle_timeout)
