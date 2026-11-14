@@ -35,7 +35,7 @@ def wrapped(lines, width):
         else:
             result.extend(textwrap.wrap(line, width=width, break_long_words=True,
                                         break_on_hyphens=False, replace_whitespace=False))
-    return "\\n".join(result)
+    return "\n".join(result)
 
 
 def dashboard(db_path, width=None):
