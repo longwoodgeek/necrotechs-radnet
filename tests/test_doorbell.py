@@ -46,6 +46,11 @@ class DoorbellTests(unittest.TestCase):
         self.assertIn("NETWORK CONNECTIVITY: NOT VERIFIED", self.request(b"2\n"))
         self.assertFalse(Path(self.db).exists())
 
+    def test_status_keeps_line_breaks(self):
+        response = self.request(b"2\n")
+        self.assertIn("NETWORK CONNECTIVITY: NOT VERIFIED\n", response)
+        self.assertIn("Transport: NOT CONNECTED\n", response)
+
     def test_command_string_not_interpreted(self):
         marker = Path(self.tmp.name) / "should-not-exist"
         self.assertIn("No commands executed", self.request(("$(touch " + str(marker) + ")\n").encode()))
