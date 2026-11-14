@@ -49,15 +49,31 @@ def read_events(db_path, limit=20):
 
 
 def station_status(db_path):
+    from .station import load, StationError
     events, error = read_events(db_path)
+    identity_path = Path(db_path).parent / "radnet-station.json"
+    try:
+        identity = load(identity_path)
+        if identity is None:
+            station_lines = ["Station identity: NOT CONFIGURED"]
+        else:
+            station_lines = [f"Station: {safe_text(identity['label'], 64)} [LOCAL CONFIGURATION ONLY]",
+                             f"Station ID: {identity['station_id']}"]
+    except StationError:
+        station_lines = ["Station identity: INVALID / UNREADABLE"]
     return "\n".join([
-        "STATION STATUS",
+        "NECROTECHS RADNET // STATION STATUS v0.5",
+        *station_lines,
+        "IDENTIFICATION: " + ("PRESENT" if identity_path.is_file() else "NOT CONFIGURED"),
+        "DRINKING PRIVILEGES: DENIED (station policy: no beverages near hardware)",
+        "NETWORK CONNECTIVITY: NOT VERIFIED",
         "Mode: LOCAL DEVELOPMENT / LOCAL POSTING ENABLED",
         "Transport: NOT CONNECTED",
-        "Identity: NOT VERIFIED",
+        "Identity: LOCAL / UNVERIFIED",
         "Federation: NOT IMPLEMENTED",
         "Emergency dispatch: NOT AVAILABLE",
         error or f"Journal: readable; showing up to {len(events)} recent events",
+        "THE NETWORK REMEMBERS",
     ])
 
 
@@ -263,7 +279,7 @@ def interactive_log(db_path, input_fn, output_fn):
 def run(db_path, *, ansi=False, input_fn=input, output_fn=print):
     """Run an interactive local session; never executes OS commands."""
     output_fn(paint(BANNER, ansi))
-    output_fn("RADNET BBS v0.4 // LOCAL DEVELOPMENT // LOCAL POSTING ENABLED")
+    output_fn("RADNET BBS v0.5-dev // LOCAL DEVELOPMENT // LOCAL POSTING ENABLED")
     output_fn("AUTHORS UNVERIFIED // No authentication or authorization.")
     output_fn("This system is experimental. No network or emergency dispatch.")
     while True:
